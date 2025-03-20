@@ -22,7 +22,7 @@ Our learning objectives are to:
 ```{r}
 #| message: false
 #| warning: false
-
+#install.packages("strength_gtex")
 #install.packages("sf")
 #install.packages("daymetr")
 #install.packages("remotes")
@@ -33,6 +33,8 @@ library(tidyverse)
 library(USAboundaries) # for US state boundaries
 library(sf) # for US map
 library(daymetr)
+
+
 ```
 
 ```{r}
@@ -78,7 +80,7 @@ What is the statistical distribution of fiber strength?
 ```{r fiber strength}
 ggplot(data = field)+
   geom_density(aes(x = strength_gtex)) #+
-  geom_rug(x = strength_gtex)
+  #geom_rug(x = strength_gtex)
 ```
 
 ```{r}
@@ -179,12 +181,16 @@ daymet_all <- field %>%
 Let's inspect weather data for the first site-year.  
 
 ```{r}
-
+daymet_all$weather[[1]]
 ```
 
 Now let's unnest the weather column.  
 ```{r}
-daymet_all_unnest 
+daymet_all_unnest <- daymet_all %>%
+  unnest(weather) %>%
+  pivot_wider(names_from = measurement, values_from = value) %>%
+  janitor::clean_names()
+  
 
 daymet_all_unnest
 
@@ -199,7 +205,7 @@ Therefore, a best practice here is to pull weather data once and export it to fi
 
 Let's do that below:  
 ```{r}
-
+write_csv(daymet_all_unnest, "../data/fieldweatherdata.csv")
 ```
 
 
